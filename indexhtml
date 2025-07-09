@@ -1,1041 +1,102 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LOT - NFT Earnings</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, query, where, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyC6KcqoGlMy-Rf37RC8qIeq4IoE4e9eqHE",
-  authDomain: "lots-37c4d.firebaseapp.com",
-  projectId: "lots-37c4d",
-  storageBucket: "lots-37c4d.firebasestorage.app",
-  messagingSenderId: "204773705240",
-  appId: "1:204773705240:web:53df9eed7cc2de3c03e56d",
-  measurementId: "G-B5V2GFKHNX"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser;
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    const uid = user.uid;
-    const userRef = doc(db, "users", uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email,
-        wallet: 0,
-        isUpgraded: false,
-        verifiedReferrals: 0,
-        referralCode: user.email.split("@")[0],
-        role: user.email === "eluxxes@gmail.com" ? "admin" : "user",
-        lotId: "LOT" + uid.slice(0, 6).toUpperCase(),
-        createdAt: serverTimestamp()
-      });
-    }
-
-    const updatedSnap = await getDoc(userRef);
-    const userData = updatedSnap.data();
-    document.querySelector("#userEmail").innerText = user.email;
-    document.querySelector("#lotId").innerText = userData.lotId;
-    document.querySelector("#walletBalance").innerText = userData.wallet + "₦";
-  } else {
-    window.location.href = "login.html";
-  }
-});
-
-async function submitDeposit() {
-  const amount = parseInt(document.querySelector("#depositAmount").value);
-  const bank = document.querySelector("#bankUsed").value;
-  const accountName = document.querySelector("#accountName").value;
-
-  if (!amount || !bank || !accountName) return alert("All fields are required");
-
-  await addDoc(collection(db, "deposits"), {
-    userId: currentUser.uid,
-    lotId: "LOT" + currentUser.uid.slice(0, 6).toUpperCase(),
-    amount,
-    bank,
-    accountName,
-    status: "pending",
-    timestamp: serverTimestamp()
-  });
-
-  alert("Deposit submitted. Please wait for admin approval.");
-  document.querySelector("#depositForm").reset();
-}
-
-document.querySelector("#logoutBtn")?.addEventListener("click", () => {
-  signOut(auth);
-});
-
-  </script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fff;
-      color: #000;
-    }
-    header {
-      background: linear-gradient(90deg, gold, #e6c300);
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.3rem;
-    }
-    nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: gold;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.5rem 0;
-    }
-    nav button {
-      background: none;
-      border: none;
-      color: white;
-      font-weight: bold;
-    }
-    section {
-      display: none;
-      padding: 1rem;
-    }
-    section.active {
-      display: block;
-    }
-    input, select {
-      padding: 0.5rem;
-      margin: 0.3rem 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button.action {
-      background-color: gold;
-      border: none;
-      padding: 0.5rem 1rem;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <header>LOT NFT Earnings</header>  <!-- Home Page -->  <section id="home" class="active">
-    <h2>Welcome, <span id="userEmail"></span></h2>
-    <p>Your LOT ID: <strong id="lotId"></strong></p>
-    <p>Use this ID for deposits and withdrawals.</p>
-  </section>  <!-- Wallet Page -->  <section id="wallet">
-    <h2>Wallet</h2>
-    <p>Current Balance: <strong id="walletBalance">₦0</strong></p>
-    <h3>Make Deposit</h3>
-    <form id="depositForm" onsubmit="event.preventDefault(); submitDeposit();">
-      <input type="number" id="depositAmount" placeholder="Amount (₦)" required />
-      <input type="text" id="bankUsed" placeholder="Bank Used" required />
-      <input type="text" id="accountName" placeholder="Account Name" required />
-      <button class="action" type="submit">Submit Deposit</button>
-    </form>
-  </section>  <!-- Bottom Navigation -->  <nav>
-    <button onclick="showTab('home')">🏠 Home</button>
-    <button onclick="showTab('wallet')">💳 Wallet</button>
-    <button onclick="showTab('nfts')">💎 My NFTs</button>
-    <button onclick="showTab('verify')">🌟 Verify</button>
-    <button onclick="showTab('profile')">👤 Profile</button>
-  </nav>  <script>
-    function showTab(id) {
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-  </script></body>
-</html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LOT - NFT Earnings</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, query, where, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyC6KcqoGlMy-Rf37RC8qIeq4IoE4e9eqHE",
-  authDomain: "lots-37c4d.firebaseapp.com",
-  projectId: "lots-37c4d",
-  storageBucket: "lots-37c4d.firebasestorage.app",
-  messagingSenderId: "204773705240",
-  appId: "1:204773705240:web:53df9eed7cc2de3c03e56d",
-  measurementId: "G-B5V2GFKHNX"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser, currentUserData;
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    const uid = user.uid;
-    const userRef = doc(db, "users", uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email,
-        wallet: 0,
-        isUpgraded: false,
-        verifiedReferrals: 0,
-        referralCode: user.email.split("@")[0],
-        role: user.email === "eluxxes@gmail.com" ? "admin" : "user",
-        lotId: "LOT" + uid.slice(0, 6).toUpperCase(),
-        createdAt: serverTimestamp()
-      });
-    }
-
-    const updatedSnap = await getDoc(userRef);
-    currentUserData = updatedSnap.data();
-    document.querySelector("#userEmail").innerText = user.email;
-    document.querySelector("#lotId").innerText = currentUserData.lotId;
-    document.querySelector("#walletBalance").innerText = currentUserData.wallet + "₦";
-  } else {
-    window.location.href = "login.html";
-  }
-});
-
-async function submitDeposit() {
-  const amount = parseInt(document.querySelector("#depositAmount").value);
-  const bank = document.querySelector("#bankUsed").value;
-  const accountName = document.querySelector("#accountName").value;
-
-  if (!amount || !bank || !accountName) return alert("All fields are required");
-
-  await addDoc(collection(db, "deposits"), {
-    userId: currentUser.uid,
-    lotId: "LOT" + currentUser.uid.slice(0, 6).toUpperCase(),
-    amount,
-    bank,
-    accountName,
-    status: "pending",
-    timestamp: serverTimestamp()
-  });
-
-  alert("Deposit submitted. Please wait for admin approval.");
-  document.querySelector("#depositForm").reset();
-}
-
-async function buyNFT(name, price, profit) {
-  if (!currentUserData.isUpgraded) return alert("Please upgrade first to buy NFTs.");
-  if (currentUserData.wallet < price) return alert("Insufficient balance.");
-
-  const purchasesQuery = query(
-    collection(db, "nftPurchases"),
-    where("userId", "==", currentUser.uid),
-    where("purchaseTime", ">=", new Date(Date.now() - 86400000))
-  );
-  const todayBuys = await getDocs(purchasesQuery);
-  if (!todayBuys.empty) return alert("You can only buy one NFT per day.");
-
-  await addDoc(collection(db, "nftPurchases"), {
-    userId: currentUser.uid,
-    nftName: name,
-    price,
-    profit,
-    purchaseTime: new Date(),
-    claimTime: new Date(Date.now() + 86400000),
-    claimed: false
-  });
-
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    wallet: currentUserData.wallet - price
-  });
-
-  alert(name + " NFT purchased! You'll receive ₦" + profit + " after 24 hours.");
-}
-
-document.querySelector("#logoutBtn")?.addEventListener("click", () => {
-  signOut(auth);
-});
-
-  </script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fff;
-      color: #000;
-    }
-    header {
-      background: linear-gradient(90deg, gold, #e6c300);
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.3rem;
-    }
-    nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: gold;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.5rem 0;
-    }
-    nav button {
-      background: none;
-      border: none;
-      color: white;
-      font-weight: bold;
-    }
-    section {
-      display: none;
-      padding: 1rem;
-    }
-    section.active {
-      display: block;
-    }
-    input, select {
-      padding: 0.5rem;
-      margin: 0.3rem 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button.action {
-      background-color: gold;
-      border: none;
-      padding: 0.5rem 1rem;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .nft-card {
-      border: 1px solid #ddd;
-      padding: 1rem;
-      margin: 0.5rem 0;
-    }
-  </style>
-</head>
-<body>
-  <header>LOT NFT Earnings</header>  <!-- Home Page -->  <section id="home" class="active">
-    <h2>Welcome, <span id="userEmail"></span></h2>
-    <p>Your LOT ID: <strong id="lotId"></strong></p>
-    <p>Use this ID for deposits and withdrawals.</p>
-  </section>  <!-- Wallet Page -->  <section id="wallet">
-    <h2>Wallet</h2>
-    <p>Current Balance: <strong id="walletBalance">₦0</strong></p>
-    <h3>Make Deposit</h3>
-    <form id="depositForm" onsubmit="event.preventDefault(); submitDeposit();">
-      <input type="number" id="depositAmount" placeholder="Amount (₦)" required />
-      <input type="text" id="bankUsed" placeholder="Bank Used" required />
-      <input type="text" id="accountName" placeholder="Account Name" required />
-      <button class="action" type="submit">Submit Deposit</button>
-    </form>
-  </section>  <!-- NFT Page -->  <section id="nfts">
-    <h2>Buy NFTs</h2>
-    <div class="nft-card">
-      <h3>Elite - ₦3000</h3>
-      <button class="action" onclick="buyNFT('Elite', 3000, 3000)">Buy Elite</button>
-    </div>
-    <div class="nft-card">
-      <h3>Skull - ₦3000</h3>
-      <button class="action" onclick="buyNFT('Skull', 3000, 3000)">Buy Skull</button>
-    </div>
-    <div class="nft-card">
-      <h3>Subi - ₦4000</h3>
-      <button class="action" onclick="buyNFT('Subi', 4000, 4000)">Buy Subi</button>
-    </div>
-    <div class="nft-card">
-      <h3>Jezz - ₦4000</h3>
-      <button class="action" onclick="buyNFT('Jezz', 4000, 4000)">Buy Jezz</button>
-    </div>
-  </section>  <!-- Bottom Navigation -->  <nav>
-    <button onclick="showTab('home')">🏠 Home</button>
-    <button onclick="showTab('wallet')">💳 Wallet</button>
-    <button onclick="showTab('nfts')">💎 My NFTs</button>
-    <button onclick="showTab('verify')">🌟 Verify</button>
-    <button onclick="showTab('profile')">👤 Profile</button>
-  </nav>  <script>
-    function showTab(id) {
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-  </script></body>
-</html>
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LOT - NFT Earnings</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, query, where, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyC6KcqoGlMy-Rf37RC8qIeq4IoE4e9eqHE",
-  authDomain: "lots-37c4d.firebaseapp.com",
-  projectId: "lots-37c4d",
-  storageBucket: "lots-37c4d.firebasestorage.app",
-  messagingSenderId: "204773705240",
-  appId: "1:204773705240:web:53df9eed7cc2de3c03e56d",
-  measurementId: "G-B5V2GFKHNX"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser, currentUserData;
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    const uid = user.uid;
-    const userRef = doc(db, "users", uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email,
-        wallet: 0,
-        isUpgraded: false,
-        verifiedReferrals: 0,
-        referralCode: user.email.split("@")[0],
-        referredBy: null,
-        role: user.email === "eluxxes@gmail.com" ? "admin" : "user",
-        lotId: "LOT" + uid.slice(0, 6).toUpperCase(),
-        createdAt: serverTimestamp()
-      });
-    }
-
-    const updatedSnap = await getDoc(userRef);
-    currentUserData = updatedSnap.data();
-    document.querySelector("#userEmail").innerText = user.email;
-    document.querySelector("#lotId").innerText = currentUserData.lotId;
-    document.querySelector("#walletBalance").innerText = currentUserData.wallet + "₦";
-    document.querySelector("#upgradeStatus").innerText = currentUserData.isUpgraded ? "Upgraded ✅" : "Not Upgraded";
-  } else {
-    window.location.href = "login.html";
-  }
-});
-
-async function submitDeposit() {
-  const amount = parseInt(document.querySelector("#depositAmount").value);
-  const bank = document.querySelector("#bankUsed").value;
-  const accountName = document.querySelector("#accountName").value;
-
-  if (!amount || !bank || !accountName) return alert("All fields are required");
-
-  await addDoc(collection(db, "deposits"), {
-    userId: currentUser.uid,
-    lotId: currentUserData.lotId,
-    amount,
-    bank,
-    accountName,
-    status: "pending",
-    timestamp: serverTimestamp()
-  });
-
-  alert("Deposit submitted. Please wait for admin approval.");
-  document.querySelector("#depositForm").reset();
-}
-
-async function buyNFT(name, price, profit) {
-  if (!currentUserData.isUpgraded) return alert("Please upgrade first to buy NFTs.");
-  if (currentUserData.wallet < price) return alert("Insufficient balance.");
-
-  const purchasesQuery = query(
-    collection(db, "nftPurchases"),
-    where("userId", "==", currentUser.uid),
-    where("purchaseTime", ">=", new Date(Date.now() - 86400000))
-  );
-  const todayBuys = await getDocs(purchasesQuery);
-  if (!todayBuys.empty) return alert("You can only buy one NFT per day.");
-
-  await addDoc(collection(db, "nftPurchases"), {
-    userId: currentUser.uid,
-    nftName: name,
-    price,
-    profit,
-    purchaseTime: new Date(),
-    claimTime: new Date(Date.now() + 86400000),
-    claimed: false
-  });
-
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    wallet: currentUserData.wallet - price
-  });
-
-  alert(name + " NFT purchased! You'll receive ₦" + profit + " after 24 hours.");
-}
-
-async function requestUpgrade() {
-  if (currentUserData.wallet < 80) return alert("You need ₦80 in your wallet to upgrade.");
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    isUpgraded: true,
-    wallet: currentUserData.wallet - 80
-  });
-  alert("You are now upgraded ✅. You can now purchase NFTs.");
-  location.reload();
-}
-
-async function requestWithdrawal() {
-  const amount = parseInt(document.querySelector("#withdrawAmount").value);
-  const account = document.querySelector("#withdrawAccount").value;
-  const bank = document.querySelector("#withdrawBank").value;
-  if (amount < 8000) return alert("Minimum withdrawal is ₦8000");
-  if (currentUserData.wallet < amount + 1000) return alert("Insufficient wallet balance (₦1000 fee required)");
-
-  await addDoc(collection(db, "withdrawals"), {
-    userId: currentUser.uid,
-    lotId: currentUserData.lotId,
-    amount,
-    fee: 1000,
-    netAmount: amount,
-    accountNumber: account,
-    bank,
-    requestTime: serverTimestamp(),
-    status: "pending"
-  });
-
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    wallet: currentUserData.wallet - (amount + 1000)
-  });
-
-  alert("Withdrawal request sent. Funds will arrive in 5 hours.");
-  document.querySelector("#withdrawForm").reset();
-}
-
-document.querySelector("#logoutBtn")?.addEventListener("click", () => {
-  signOut(auth);
-});
-
-  </script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fff;
-      color: #000;
-    }
-    header {
-      background: linear-gradient(90deg, gold, #e6c300);
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.3rem;
-    }
-    nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: gold;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.5rem 0;
-    }
-    nav button {
-      background: none;
-      border: none;
-      color: white;
-      font-weight: bold;
-    }
-    section {
-      display: none;
-      padding: 1rem;
-    }
-    section.active {
-      display: block;
-    }
-    input, select {
-      padding: 0.5rem;
-      margin: 0.3rem 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button.action {
-      background-color: gold;
-      border: none;
-      padding: 0.5rem 1rem;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .nft-card {
-      border: 1px solid #ddd;
-      padding: 1rem;
-      margin: 0.5rem 0;
-    }
-  </style>
-</head>
-<body>
-  <header>LOT NFT Earnings</header>  <section id="home" class="active">
-    <h2>Welcome, <span id="userEmail"></span></h2>
-    <p>Your LOT ID: <strong id="lotId"></strong></p>
-    <p>Status: <strong id="upgradeStatus"></strong></p>
-    <p>Use this ID for deposits and withdrawals.</p>
-  </section>  <section id="wallet">
-    <h2>Wallet</h2>
-    <p>Current Balance: <strong id="walletBalance">₦0</strong></p>
-    <h3>Make Deposit</h3>
-    <form id="depositForm" onsubmit="event.preventDefault(); submitDeposit();">
-      <input type="number" id="depositAmount" placeholder="Amount (₦)" required />
-      <input type="text" id="bankUsed" placeholder="Bank Used" required />
-      <input type="text" id="accountName" placeholder="Account Name" required />
-      <button class="action" type="submit">Submit Deposit</button>
-    </form>
-    <h3>Request Withdrawal</h3>
-    <form id="withdrawForm" onsubmit="event.preventDefault(); requestWithdrawal();">
-      <input type="number" id="withdrawAmount" placeholder="Amount to Withdraw" required />
-      <input type="text" id="withdrawBank" placeholder="Bank Name" required />
-      <input type="text" id="withdrawAccount" placeholder="Account Number" required />
-      <button class="action" type="submit">Request Withdrawal</button>
-    </form>
-  </section>  <section id="nfts">
-    <h2>Buy NFTs</h2>
-    <div class="nft-card">
-      <h3>Elite - ₦3000</h3>
-      <button class="action" onclick="buyNFT('Elite', 3000, 3000)">Buy Elite</button>
-    </div>
-    <div class="nft-card">
-      <h3>Skull - ₦3000</h3>
-      <button class="action" onclick="buyNFT('Skull', 3000, 3000)">Buy Skull</button>
-    </div>
-    <div class="nft-card">
-      <h3>Subi - ₦4000</h3>
-      <button class="action" onclick="buyNFT('Subi', 4000, 4000)">Buy Subi</button>
-    </div>
-    <div class="nft-card">
-      <h3>Jezz - ₦4000</h3>
-      <button class="action" onclick="buyNFT('Jezz', 4000, 4000)">Buy Jezz</button>
-    </div>
-  </section>  <section id="verify">
-    <h2>Upgrade & Referrals</h2>
-    <p>Referral Link: <code>lot.app/register?ref=<span id="userEmail"></span></code></p>
-    <p>You need 3 verified referrals to activate buying.</p>
-    <button class="action" onclick="requestUpgrade()">Upgrade Now (₦80)</button>
-  </section>  <section id="profile">
-    <h2>Profile</h2>
-    <p>Email: <strong id="userEmail"></strong></p>
-    <p>LOT ID: <strong id="lotId"></strong></p>
-    <button class="action" id="logoutBtn">Logout</button>
-    <hr>
-    <h4>Disclaimer</h4>
-    <p>This platform simulates NFT profit earning. Earnings are fixed and not based on crypto value. Payments are made manually. Always confirm from the admin before investing.</p>
-  </section>  <nav>
-    <button onclick="showTab('home')">🏠 Home</button>
-    <button onclick="showTab('wallet')">💳 Wallet</button>
-    <button onclick="showTab('nfts')">💎 My NFTs</button>
-    <button onclick="showTab('verify')">🌟 Verify</button>
-    <button onclick="showTab('profile')">👤 Profile</button>
-  </nav>  <script>
-    function showTab(id) {
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-  </script></body>
-</html>
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LOT - NFT Earnings</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, query, where, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyC6KcqoGlMy-Rf37RC8qIeq4IoE4e9eqHE",
-  authDomain: "lots-37c4d.firebaseapp.com",
-  projectId: "lots-37c4d",
-  storageBucket: "lots-37c4d.firebasestorage.app",
-  messagingSenderId: "204773705240",
-  appId: "1:204773705240:web:53df9eed7cc2de3c03e56d",
-  measurementId: "G-B5V2GFKHNX"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentUser, currentUserData;
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    const uid = user.uid;
-    const userRef = doc(db, "users", uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email,
-        wallet: 0,
-        isUpgraded: false,
-        verifiedReferrals: 0,
-        referralCode: user.email.split("@")[0],
-        referredBy: null,
-        role: user.email === "eluxxes@gmail.com" ? "admin" : "user",
-        lotId: "LOT" + uid.slice(0, 6).toUpperCase(),
-        createdAt: serverTimestamp()
-      });
-    }
-
-    const updatedSnap = await getDoc(userRef);
-    currentUserData = updatedSnap.data();
-    document.querySelector("#userEmail").innerText = user.email;
-    document.querySelector("#lotId").innerText = currentUserData.lotId;
-    document.querySelector("#walletBalance").innerText = currentUserData.wallet + "₦";
-    document.querySelector("#upgradeStatus").innerText = currentUserData.isUpgraded ? "Upgraded ✅" : "Not Upgraded";
-  } else {
-    window.location.href = "login.html";
-  }
-});
-
-async function submitDeposit() {
-  const amount = parseInt(document.querySelector("#depositAmount").value);
-  const bank = document.querySelector("#bankUsed").value;
-  const accountName = document.querySelector("#accountName").value;
-
-  if (!amount || !bank || !accountName) return alert("All fields are required");
-
-  await addDoc(collection(db, "deposits"), {
-    userId: currentUser.uid,
-    lotId: currentUserData.lotId,
-    amount,
-    bank,
-    accountName,
-    status: "pending",
-    timestamp: serverTimestamp()
-  });
-
-  alert("Deposit submitted. Please wait for admin approval.");
-  document.querySelector("#depositForm").reset();
-}
-
-async function buyNFT(name, price, profit) {
-  if (!currentUserData.isUpgraded) return alert("Please upgrade first to buy NFTs.");
-  if (currentUserData.wallet < price) return alert("Insufficient balance.");
-
-  const purchasesQuery = query(
-    collection(db, "nftPurchases"),
-    where("userId", "==", currentUser.uid),
-    where("purchaseTime", ">=", new Date(Date.now() - 86400000))
-  );
-  const todayBuys = await getDocs(purchasesQuery);
-  if (!todayBuys.empty) return alert("You can only buy one NFT per day.");
-
-  await addDoc(collection(db, "nftPurchases"), {
-    userId: currentUser.uid,
-    nftName: name,
-    price,
-    profit,
-    purchaseTime: new Date(),
-    claimTime: new Date(Date.now() + 86400000),
-    claimed: false
-  });
-
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    wallet: currentUserData.wallet - price
-  });
-
-  alert(name + " NFT purchased! You'll receive ₦" + profit + " after 24 hours.");
-}
-
-async function requestUpgrade() {
-  if (currentUserData.wallet < 80) return alert("You need ₦80 in your wallet to upgrade.");
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    isUpgraded: true,
-    wallet: currentUserData.wallet - 80
-  });
-  alert("You are now upgraded ✅. You can now purchase NFTs.");
-  location.reload();
-}
-
-async function requestWithdrawal() {
-  const amount = parseInt(document.querySelector("#withdrawAmount").value);
-  const account = document.querySelector("#withdrawAccount").value;
-  const bank = document.querySelector("#withdrawBank").value;
-  if (amount < 8000) return alert("Minimum withdrawal is ₦8000");
-  if (currentUserData.wallet < amount + 1000) return alert("Insufficient wallet balance (₦1000 fee required)");
-
-  await addDoc(collection(db, "withdrawals"), {
-    userId: currentUser.uid,
-    lotId: currentUserData.lotId,
-    amount,
-    fee: 1000,
-    netAmount: amount,
-    accountNumber: account,
-    bank,
-    requestTime: serverTimestamp(),
-    status: "pending"
-  });
-
-  await updateDoc(doc(db, "users", currentUser.uid), {
-    wallet: currentUserData.wallet - (amount + 1000)
-  });
-
-  alert("Withdrawal request sent. Funds will arrive in 5 hours.");
-  document.querySelector("#withdrawForm").reset();
-}
-
-document.querySelector("#logoutBtn")?.addEventListener("click", () => {
-  signOut(auth);
-});
-
-  </script>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #fff;
-      color: #000;
-    }
-    header {
-      background: linear-gradient(90deg, gold, #e6c300);
-      color: white;
-      padding: 1rem;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.3rem;
-    }
-    nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background-color: gold;
-      display: flex;
-      justify-content: space-around;
-      padding: 0.5rem 0;
-    }
-    nav button {
-      background: none;
-      border: none;
-      color: white;
-      font-weight: bold;
-    }
-    section {
-      display: none;
-      padding: 1rem;
-    }
-    section.active {
-      display: block;
-    }
-    input, select {
-      padding: 0.5rem;
-      margin: 0.3rem 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button.action {
-      background-color: gold;
-      border: none;
-      padding: 0.5rem 1rem;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .nft-card {
-      border: 1px solid #ddd;
-      padding: 1rem;
-      margin: 0.5rem 0;
-    }
-  </style>
-</head>
-<body>
-  <header>LOT NFT Earnings</header>  <section id="home" class="active">
-    <h2>Welcome, <span id="userEmail"></span></h2>
-    <p>Your LOT ID: <strong id="lotId"></strong></p>
-    <p>Status: <strong id="upgradeStatus"></strong></p>
-    <p>Use this ID for deposits and withdrawals.</p>
-  </section>  <section id="wallet">
-    <h2>Wallet</h2>
-    <p>Current Balance: <strong id="walletBalance">₦0</strong></p>
-    <h3>Make Deposit</h3>
-    <form id="depositForm" onsubmit="event.preventDefault(); submitDeposit();">
-      <input type="number" id="depositAmount" placeholder="Amount (₦)" required />
-      <input type="text" id="bankUsed" placeholder="Bank Used" required />
-      <input type="text" id="accountName" placeholder="Account Name" required />
-      <button class="action" type="submit">Submit Deposit</button>
-    </form>
-    <h3>Request Withdrawal</h3>
-    <form id="withdrawForm" onsubmit="event.preventDefault(); requestWithdrawal();">
-      <input type="number" id="withdrawAmount" placeholder="Amount to Withdraw" required />
-      <input type="text" id="withdrawBank" placeholder="Bank Name" required />
-      <input type="text" id="withdrawAccount" placeholder="Account Number" required />
-      <button class="action" type="submit">Request Withdrawal</button>
-    </form>
-  </section>  <section id="nfts">
-    <h2>Buy NFTs</h2>
-    <div class="nft-card">
-      <h3>Elite - ₦3000</h3>
-      <button class="action" onclick="buyNFT('Elite', 3000, 3000)">Buy Elite</button>
-    </div>
-    <div class="nft-card">
-      <h3>Skull - ₦3000</h3>
-      <button class="action" onclick="buyNFT('Skull', 3000, 3000)">Buy Skull</button>
-    </div>
-    <div class="nft-card">
-      <h3>Subi - ₦4000</h3>
-      <button class="action" onclick="buyNFT('Subi', 4000, 4000)">Buy Subi</button>
-    </div>
-    <div class="nft-card">
-      <h3>Jezz - ₦4000</h3>
-      <button class="action" onclick="buyNFT('Jezz', 4000, 4000)">Buy Jezz</button>
-    </div>
-  </section>  <section id="verify">
-    <h2>Upgrade & Referrals</h2>
-    <p>Referral Link: <code>lot.app/register?ref=<span id="userEmail"></span></code></p>
-    <p>You need 3 verified referrals to activate buying.</p>
-    <button class="action" onclick="requestUpgrade()">Upgrade Now (₦80)</button>
-  </section>  <section id="profile">
-    <h2>Profile</h2>
-    <p>Email: <strong id="userEmail"></strong></p>
-    <p>LOT ID: <strong id="lotId"></strong></p>
-    <button class="action" id="logoutBtn">Logout</button>
-    <hr>
-    <h4>Disclaimer</h4>
-    <p>This platform simulates NFT profit earning. Earnings are fixed and not based on crypto value. Payments are made manually. Always confirm from the admin before investing.</p>
-  </section>  <nav>
-    <button onclick="showTab('home')">🏠 Home</button>
-    <button onclick="showTab('wallet')">💳 Wallet</button>
-    <button onclick="showTab('nfts')">💎 My NFTs</button>
-    <button onclick="showTab('verify')">🌟 Verify</button>
-    <button onclick="showTab('profile')">👤 Profile</button>
-  </nav>  <script>
-    function showTab(id) {
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-  </script></body>
-</html>
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LOT - NFT Earnings</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
       getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, query, where, getDocs, orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";const firebaseConfig = {
-  apiKey: "AIzaSyC6KcqoGlMy-Rf37RC8qIeq4IoE4e9eqHE",
-  authDomain: "lots-37c4d.firebaseapp.com",
-  projectId: "lots-37c4d",
-  storageBucket: "lots-37c4d.firebasestorage.app",
-  messagingSenderId: "204773705240",
-  appId: "1:204773705240:web:53df9eed7cc2de3c03e56d",
-  measurementId: "G-B5V2GFKHNX"
-};
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6KcqoGlMy-Rf37RC8qIeq4IoE4e9eqHE",
+      authDomain: "lots-37c4d.firebaseapp.com",
+      projectId: "lots-37c4d",
+      storageBucket: "lots-37c4d.firebasestorage.app",
+      messagingSenderId: "204773705240",
+      appId: "1:204773705240:web:53df9eed7cc2de3c03e56d",
+      measurementId: "G-B5V2GFKHNX"
+    };
 
-let currentUser, currentUserData;
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    if (!userSnap.exists()) return;
-    currentUserData = userSnap.data();
+    let currentUser, currentUserData;
 
-    document.querySelector("#userEmail").innerText = user.email;
-    document.querySelector("#lotId").innerText = currentUserData.lotId;
-    document.querySelector("#walletBalance").innerText = currentUserData.wallet + "₦";
-    document.querySelector("#upgradeStatus").innerText = currentUserData.isUpgraded ? "Upgraded ✅" : "Not Upgraded";
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        const uid = user.uid;
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
 
-    if (currentUserData.role === "admin") {
-      document.getElementById("adminPanel").style.display = "block";
-      loadRequests();
+        if (!userSnap.exists()) {
+          await setDoc(userRef, {
+            email: user.email,
+            wallet: 0,
+            isUpgraded: false,
+            verifiedReferrals: 0,
+            referralCode: user.email.split("@")[0],
+            referredBy: null,
+            role: user.email === "eluxxes@gmail.com" ? "admin" : "user",
+            lotId: "LOT" + uid.slice(0, 6).toUpperCase(),
+            createdAt: serverTimestamp()
+          });
+        }
+
+        const updatedSnap = await getDoc(userRef);
+        currentUserData = updatedSnap.data();
+        document.querySelector("#userEmail").innerText = user.email;
+        document.querySelector("#lotId").innerText = currentUserData.lotId;
+        document.querySelector("#walletBalance").innerText = currentUserData.wallet + "₦";
+        document.querySelector("#upgradeStatus").innerText = currentUserData.isUpgraded ? "Upgraded ✅" : "Not Upgraded";
+
+        if (currentUserData.role === "admin") {
+          document.getElementById("adminPanel").style.display = "block";
+          loadRequests();
+        }
+
+        showTab("home");
+        document.getElementById("authPage").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+      } else {
+        document.getElementById("authPage").style.display = "block";
+        document.getElementById("mainApp").style.display = "none";
+      }
+    });
+
+    async function registerUser() {
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } catch (e) {
+        alert("Register Error: " + e.message);
+      }
     }
-  } else {
-    window.location.href = "login.html";
-  }
-});
 
-async function loadRequests() {
-  const depositSnap = await getDocs(query(collection(db, "deposits"), orderBy("timestamp", "desc")));
-  const withdrawSnap = await getDocs(query(collection(db, "withdrawals"), orderBy("requestTime", "desc")));
+    async function loginUser() {
+      const email = document.getElementById("logEmail").value;
+      const password = document.getElementById("logPassword").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (e) {
+        alert("Login Error: " + e.message);
+      }
+    }
 
-  const depositList = document.getElementById("depositList");
-  const withdrawList = document.getElementById("withdrawList");
-  depositList.innerHTML = "";
-  withdrawList.innerHTML = "";
+    function showTab(id) {
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
 
-  depositSnap.forEach(docSnap => {
-    const d = docSnap.data();
-    const div = document.createElement("div");
-    div.innerHTML = `<b>${d.lotId}</b> - ₦${d.amount} from ${d.bank} (${d.accountName}) [${d.status}]<br>
-      <button onclick="approveDeposit('${docSnap.id}', ${d.amount}, '${d.userId}')">Approve</button>
-      <button onclick="rejectDeposit('${docSnap.id}')">Reject</button><hr>`;
-    depositList.appendChild(div);
-  });
-
-  withdrawSnap.forEach(docSnap => {
-    const d = docSnap.data();
-    const div = document.createElement("div");
-    div.innerHTML = `<b>${d.lotId}</b> - ₦${d.amount} to ${d.bank} (${d.accountNumber}) [${d.status}]<br>
-      <button onclick="approveWithdraw('${docSnap.id}')">Mark Paid</button>
-      <button onclick="rejectWithdraw('${docSnap.id}', ${d.amount + 1000}, '${d.userId}')">Reject</button><hr>`;
-    withdrawList.appendChild(div);
-  });
-}
-
-async function approveDeposit(id, amount, userId) {
-  await updateDoc(doc(db, "deposits", id), { status: "approved" });
-  const userRef = doc(db, "users", userId);
-  const userSnap = await getDoc(userRef);
-  if (userSnap.exists()) {
-    const currentBalance = userSnap.data().wallet || 0;
-    await updateDoc(userRef, { wallet: currentBalance + amount });
-  }
-  alert("Deposit approved and balance credited.");
-  loadRequests();
-}
-
-async function rejectDeposit(id) {
-  await updateDoc(doc(db, "deposits", id), { status: "rejected" });
-  alert("Deposit rejected.");
-  loadRequests();
-}
-
-async function approveWithdraw(id) {
-  await updateDoc(doc(db, "withdrawals", id), { status: "paid" });
-  alert("Withdrawal marked as paid.");
-  loadRequests();
-}
-
-async function rejectWithdraw(id, amount, userId) {
-  await updateDoc(doc(db, "withdrawals", id), { status: "rejected" });
-  const userRef = doc(db, "users", userId);
-  const userSnap = await getDoc(userRef);
-  if (userSnap.exists()) {
-    const currentBalance = userSnap.data().wallet || 0;
-    await updateDoc(userRef, { wallet: currentBalance + amount });
-  }
-  alert("Withdrawal rejected and amount refunded.");
-  loadRequests();
-}
-
-document.querySelector("#logoutBtn")?.addEventListener("click", () => signOut(auth));
-
+    document.getElementById("logoutBtn")?.addEventListener("click", () => signOut(auth));
   </script>
+
   <style>
     body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #fff; color: #000; }
     header { background: linear-gradient(90deg, gold, #e6c300); color: white; padding: 1rem; text-align: center; font-weight: bold; font-size: 1.3rem; }
@@ -1049,32 +110,249 @@ document.querySelector("#logoutBtn")?.addEventListener("click", () => signOut(au
     .admin-panel { background: #f8f8f8; padding: 1rem; border: 2px solid gold; margin-top: 1rem; }
   </style>
 </head>
+
 <body>
-  <header>LOT NFT Earnings</header>  <!-- Existing sections... -->  <section id="profile" class="active">
-    <h2>Profile</h2>
-    <p>Email: <strong id="userEmail"></strong></p>
-    <p>LOT ID: <strong id="lotId"></strong></p>
-    <button class="action" id="logoutBtn">Logout</button>
-    <div class="admin-panel" id="adminPanel" style="display:none">
-      <h3>🛠 Admin Dashboard</h3>
-      <h4>Pending Deposits</h4>
-      <div id="depositList"></div>
-      <h4>Pending Withdrawals</h4>
-      <div id="withdrawList"></div>
-    </div>
-    <hr>
-    <h4>Disclaimer</h4>
-    <p>This platform simulates NFT profit earning. Earnings are fixed and not based on crypto value. Payments are made manually. Always confirm from the admin before investing.</p>
-  </section>  <nav>
-    <button onclick="showTab('home')">🏠 Home</button>
-    <button onclick="showTab('wallet')">💳 Wallet</button>
-    <button onclick="showTab('nfts')">💎 My NFTs</button>
-    <button onclick="showTab('verify')">🌟 Verify</button>
-    <button onclick="showTab('profile')">👤 Profile</button>
-  </nav>  <script>
-    function showTab(id) {
-      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
+  <header>LOT NFT Earnings</header>
+
+  <div id="authPage" style="padding:1rem;">
+    <h2>Login</h2>
+    <input id="logEmail" type="email" placeholder="Email" />
+    <input id="logPassword" type="password" placeholder="Password" />
+    <button onclick="loginUser()">Login</button>
+
+    <h3>OR Register</h3>
+    <input id="regEmail" type="email" placeholder="Email" />
+    <input id="regPassword" type="password" placeholder="Password" />
+    <button onclick="registerUser()">Register</button>
+  </div>
+
+  <div id="mainApp" style="display:none;">
+    <section id="home" class="active">
+      <h2>Welcome, <span id="userEmail"></span></h2>
+      <p>Your LOT ID: <strong id="lotId"></strong></p>
+      <p>Status: <strong id="upgradeStatus"></strong></p>
+      <p>Use this ID for deposits and withdrawals.</p>
+    </section>
+
+    <section id="wallet">
+      <h2>Wallet</h2>
+      <p>Current Balance: <strong id="walletBalance">₦0</strong></p>
+      <h3>Make Deposit</h3>
+      <form id="depositForm" onsubmit="event.preventDefault(); submitDeposit();">
+        <input type="number" id="depositAmount" placeholder="Amount (₦)" required />
+        <input type="text" id="bankUsed" placeholder="Bank Used" required />
+        <input type="text" id="accountName" placeholder="Account Name" required />
+        <button class="action" type="submit">Submit Deposit</button>
+      </form>
+
+      <h3>Request Withdrawal</h3>
+      <form id="withdrawForm" onsubmit="event.preventDefault(); requestWithdrawal();">
+        <input type="number" id="withdrawAmount" placeholder="Amount to Withdraw" required />
+        <input type="text" id="withdrawBank" placeholder="Bank Name" required />
+        <input type="text" id="withdrawAccount" placeholder="Account Number" required />
+        <button class="action" type="submit">Request Withdrawal</button>
+      </form>
+    </section>
+
+    <section id="nfts">
+      <h2>Buy NFTs</h2>
+      <div class="nft-card">
+        <h3>Elite - ₦3000</h3>
+        <button class="action" onclick="buyNFT('Elite', 3000, 3000)">Buy Elite</button>
+      </div>
+      <div class="nft-card">
+        <h3>Skull - ₦3000</h3>
+        <button class="action" onclick="buyNFT('Skull', 3000, 3000)">Buy Skull</button>
+      </div>
+      <div class="nft-card">
+        <h3>Subi - ₦4000</h3>
+        <button class="action" onclick="buyNFT('Subi', 4000, 4000)">Buy Subi</button>
+      </div>
+      <div class="nft-card">
+        <h3>Jezz - ₦4000</h3>
+        <button class="action" onclick="buyNFT('Jezz', 4000, 4000)">Buy Jezz</button>
+      </div>
+    </section>
+
+    <section id="verify">
+      <h2>Upgrade & Referrals</h2>
+      <p>Referral Link: <code>lot.app/register?ref=<span id="userEmail"></span></code></p>
+      <p>You need 3 verified referrals to activate buying.</p>
+      <button class="action" onclick="requestUpgrade()">Upgrade Now ($0.80)</button>
+    </section>
+<section id="profile">
+      <h2>Profile</h2>
+      <p>Email: <strong id="userEmail"></strong></p>
+      <p>LOT ID: <strong id="lotId"></strong></p>
+      <p>Wallet: <strong id="walletBalance"></strong></p>
+      <button class="action" id="logoutBtn">Logout</button>
+
+      <div class="admin-panel" id="adminPanel" style="display:none">
+        <h3>🛠 Admin Dashboard</h3>
+        <h4>Pending Deposits</h4>
+        <div id="depositList"></div>
+        <h4>Pending Withdrawals</h4>
+        <div id="withdrawList"></div>
+      </div>
+
+      <hr>
+      <h4>Disclaimer</h4>
+      <p>This platform simulates NFT profit earning. Earnings are fixed and not based on crypto value. Payments are made manually. Always confirm from the admin before investing.</p>
+    </section>
+
+    <nav>
+      <button onclick="showTab('home')">🏠 Home</button>
+      <button onclick="showTab('wallet')">💳 Wallet</button>
+      <button onclick="showTab('nfts')">💎 NFTs</button>
+      <button onclick="showTab('verify')">🌟 Upgrade</button>
+      <button onclick="showTab('profile')">👤 Profile</button>
+    </nav>
+  </div>
+
+  <script type="module">
+    import {
+      addDoc, updateDoc, doc, getDoc, collection, serverTimestamp, getDocs, query, where
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    async function submitDeposit() {
+      const amount = parseInt(document.getElementById("depositAmount").value);
+      const bank = document.getElementById("bankUsed").value;
+      const name = document.getElementById("accountName").value;
+      if (!currentUser) return alert("Login required");
+      await addDoc(collection(db, "deposits"), {
+        userId: currentUser.uid,
+        lotId: currentUserData.lotId,
+        amount,
+        bank,
+        accountName: name,
+        status: "pending",
+        timestamp: serverTimestamp()
+      });
+      alert("Deposit submitted!");
     }
-  </script></body>
+
+    async function requestWithdrawal() {
+      const amount = parseInt(document.getElementById("withdrawAmount").value);
+      const bank = document.getElementById("withdrawBank").value;
+      const acct = document.getElementById("withdrawAccount").value;
+      const total = amount + 1000;
+      if (amount < 8000) return alert("Min withdrawal is ₦8000");
+      if (currentUserData.wallet < total) return alert("Insufficient funds (₦" + total + " needed)");
+      await addDoc(collection(db, "withdrawals"), {
+        userId: currentUser.uid,
+        lotId: currentUserData.lotId,
+        amount,
+        bank,
+        accountNumber: acct,
+        status: "pending",
+        requestTime: serverTimestamp()
+      });
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        wallet: currentUserData.wallet - total
+      });
+      alert("Withdrawal requested! ₦1000 fee included.");
+    }
+
+    async function buyNFT(name, price, profit) {
+      if (!currentUserData.isUpgraded) return alert("You must upgrade first.");
+      const now = Date.now();
+      const purchases = await getDocs(query(collection(db, "nftPurchases"),
+        where("userId", "==", currentUser.uid),
+        where("purchaseDate", ">=", now - 86400000) // past 24h
+      ));
+      if (!purchases.empty) return alert("Only one NFT can be purchased per day.");
+
+      if (currentUserData.wallet < price) return alert("Insufficient balance.");
+      await addDoc(collection(db, "nftPurchases"), {
+        userId: currentUser.uid,
+        lotId: currentUserData.lotId,
+        nftName: name,
+        price,
+        profit,
+        claimed: false,
+        purchaseDate: now,
+        claimTime: new Date(Date.now() + 24 * 3600000)
+      });
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        wallet: currentUserData.wallet - price
+      });
+      alert(name + " purchased! You'll earn ₦" + profit + " after 24 hours.");
+    }
+
+    async function requestUpgrade() {
+      if (currentUserData.wallet < 80) return alert("Upgrade costs ₦80. Fund wallet first.");
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        isUpgraded: true,
+        wallet: currentUserData.wallet - 80
+      });
+      alert("Account upgraded! You can now buy NFTs.");
+      location.reload();
+    }
+
+    async function loadRequests() {
+      const depositSnap = await getDocs(query(collection(db, "deposits")));
+      const withdrawSnap = await getDocs(query(collection(db, "withdrawals")));
+      const depositList = document.getElementById("depositList");
+      const withdrawList = document.getElementById("withdrawList");
+      depositList.innerHTML = \"\";
+      withdrawList.innerHTML = \"\";
+      depositSnap.forEach(docSnap => {
+        const d = docSnap.data();
+        if (d.status === \"pending\") {
+          const div = document.createElement(\"div\");
+          div.innerHTML = `<b>${d.lotId}</b> - ₦${d.amount} from ${d.bank} (${d.accountName})<br>
+          <button onclick=\"approveDeposit('${docSnap.id}', ${d.amount}, '${d.userId}')\">Approve</button>
+          <button onclick=\"rejectDeposit('${docSnap.id}')\">Reject</button><hr>`;
+          depositList.appendChild(div);
+        }
+      });
+      withdrawSnap.forEach(docSnap => {
+        const d = docSnap.data();
+        if (d.status === \"pending\") {
+          const div = document.createElement(\"div\");
+          div.innerHTML = `<b>${d.lotId}</b> - ₦${d.amount} to ${d.bank} (${d.accountNumber})<br>
+          <button onclick=\"approveWithdraw('${docSnap.id}')\">Mark Paid</button>
+          <button onclick=\"rejectWithdraw('${docSnap.id}', ${d.amount + 1000}, '${d.userId}')\">Reject</button><hr>`;
+          withdrawList.appendChild(div);
+        }
+      });
+    }
+
+    async function approveDeposit(id, amount, userId) {
+      await updateDoc(doc(db, "deposits", id), { status: "approved" });
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const currentBalance = userSnap.data().wallet || 0;
+        await updateDoc(userRef, { wallet: currentBalance + amount });
+      }
+      alert("Deposit approved and balance credited.");
+      loadRequests();
+    }
+
+    async function rejectDeposit(id) {
+      await updateDoc(doc(db, "deposits", id), { status: "rejected" });
+      alert("Deposit rejected.");
+      loadRequests();
+    }
+
+    async function approveWithdraw(id) {
+      await updateDoc(doc(db, "withdrawals", id), { status: "paid" });
+      alert("Withdrawal marked as paid.");
+      loadRequests();
+    }
+
+    async function rejectWithdraw(id, amount, userId) {
+      await updateDoc(doc(db, "withdrawals", id), { status: "rejected" });
+      const userRef = doc(db, "users", userId);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const currentBalance = userSnap.data().wallet || 0;
+        await updateDoc(userRef, { wallet: currentBalance + amount });
+      }
+      alert("Withdrawal rejected and amount refunded.");
+      loadRequests();
+    }
+  </script>
+</body>
 </html>
