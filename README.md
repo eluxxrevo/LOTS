@@ -1,0 +1,2 @@
+# LOTS
+Nfts boom
