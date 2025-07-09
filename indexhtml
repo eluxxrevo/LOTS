@@ -110,11 +110,9 @@
     .admin-panel { background: #f8f8f8; padding: 1rem; border: 2px solid gold; margin-top: 1rem; }
   </style>
 </head>
-
 <body>
   <header>LOT NFT Earnings</header>
-
-  <div id="authPage" style="padding:1rem;">
+<div id="authPage" style="padding:1rem;">
     <h2>Login</h2>
     <input id="logEmail" type="email" placeholder="Email" />
     <input id="logPassword" type="password" placeholder="Password" />
@@ -178,9 +176,10 @@
       <h2>Upgrade & Referrals</h2>
       <p>Referral Link: <code>lot.app/register?ref=<span id="userEmail"></span></code></p>
       <p>You need 3 verified referrals to activate buying.</p>
-      <button class="action" onclick="requestUpgrade()">Upgrade Now ($0.80)</button>
+      <button class="action" onclick="requestUpgrade()">Upgrade Now (₦80)</button>
     </section>
-<section id="profile">
+
+    <section id="profile">
       <h2>Profile</h2>
       <p>Email: <strong id="userEmail"></strong></p>
       <p>LOT ID: <strong id="lotId"></strong></p>
@@ -208,8 +207,7 @@
       <button onclick="showTab('profile')">👤 Profile</button>
     </nav>
   </div>
-
-  <script type="module">
+<script type="module">
     import {
       addDoc, updateDoc, doc, getDoc, collection, serverTimestamp, getDocs, query, where
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -258,10 +256,9 @@
       const now = Date.now();
       const purchases = await getDocs(query(collection(db, "nftPurchases"),
         where("userId", "==", currentUser.uid),
-        where("purchaseDate", ">=", now - 86400000) // past 24h
+        where("purchaseDate", ">=", now - 86400000)
       ));
       if (!purchases.empty) return alert("Only one NFT can be purchased per day.");
-
       if (currentUserData.wallet < price) return alert("Insufficient balance.");
       await addDoc(collection(db, "nftPurchases"), {
         userId: currentUser.uid,
@@ -294,25 +291,25 @@
       const withdrawSnap = await getDocs(query(collection(db, "withdrawals")));
       const depositList = document.getElementById("depositList");
       const withdrawList = document.getElementById("withdrawList");
-      depositList.innerHTML = \"\";
-      withdrawList.innerHTML = \"\";
+      depositList.innerHTML = "";
+      withdrawList.innerHTML = "";
       depositSnap.forEach(docSnap => {
         const d = docSnap.data();
-        if (d.status === \"pending\") {
-          const div = document.createElement(\"div\");
+        if (d.status === "pending") {
+          const div = document.createElement("div");
           div.innerHTML = `<b>${d.lotId}</b> - ₦${d.amount} from ${d.bank} (${d.accountName})<br>
-          <button onclick=\"approveDeposit('${docSnap.id}', ${d.amount}, '${d.userId}')\">Approve</button>
-          <button onclick=\"rejectDeposit('${docSnap.id}')\">Reject</button><hr>`;
+          <button onclick="approveDeposit('${docSnap.id}', ${d.amount}, '${d.userId}')">Approve</button>
+          <button onclick="rejectDeposit('${docSnap.id}')">Reject</button><hr>`;
           depositList.appendChild(div);
         }
       });
       withdrawSnap.forEach(docSnap => {
         const d = docSnap.data();
-        if (d.status === \"pending\") {
-          const div = document.createElement(\"div\");
+        if (d.status === "pending") {
+          const div = document.createElement("div");
           div.innerHTML = `<b>${d.lotId}</b> - ₦${d.amount} to ${d.bank} (${d.accountNumber})<br>
-          <button onclick=\"approveWithdraw('${docSnap.id}')\">Mark Paid</button>
-          <button onclick=\"rejectWithdraw('${docSnap.id}', ${d.amount + 1000}, '${d.userId}')\">Reject</button><hr>`;
+          <button onclick="approveWithdraw('${docSnap.id}')">Mark Paid</button>
+          <button onclick="rejectWithdraw('${docSnap.id}', ${d.amount + 1000}, '${d.userId}')">Reject</button><hr>`;
           withdrawList.appendChild(div);
         }
       });
